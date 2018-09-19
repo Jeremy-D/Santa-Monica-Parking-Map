@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 400px;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <button id="log-data">Log Data</button>
+    <button id="draw-new-path">Draw Monday</button>
+    <button id="erase-monday-path">Erase Monday</button>
+
+
+    <script type="text/javascript" src="maps/mapV3.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCU1RvZAh_d4TPH07kiqHiZku0cpIqFLXI&callback=initMap"
+    async defer></script>
+    <script type="text/javascript" src="streetSweeping.js"></script>
+  </body>
+</html>
