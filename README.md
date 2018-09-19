@@ -1,0 +1,4 @@
+## Santa Monica ARC gis to google maps parser
+This app is meant to convert street sweeping data from the Santa Monica GIS Data Portal to be drawn on a Google Maps map. We have many clients coming in and out of my job all day and parking can be difficult. The purpose of this app is to show clients where they can park and not get a ticket. I'm hoping to build this app out to have a better UI and be able to process more of the open GIS data that the city of Santa Monica has. 
+
+ This app uses fetch to grab the data from an API endpoint generated at the [Santa Monica GIS Data Portal](https://gis-smgov.opendata.arcgis.com/datasets/299cd32301b34e1792812ce8b5c30fe7_3/geoservice)
