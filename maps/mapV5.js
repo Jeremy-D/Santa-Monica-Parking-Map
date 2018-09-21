@@ -33,17 +33,11 @@
             return response.json()
           })
           .then(function(myJson){
+            console.log(myJson);
             let currentPath = {};
             let latLngArr = [];
             let latLngArrMaster = [];
             var currentPnt = {lat: 0, lng: 0};
-
-            function createPathObj(pointArr){
-              let pointObj = {lat:0, lng:0};
-              pointObj.lat = pointArr[1];
-              pointObj.lng = pointArr[0];
-              return pointObj;
-            }
 
             // 1 grab latLng paths - filter
             currentDay = 'Wednesday';
@@ -54,8 +48,9 @@
             console.log(filterLatLngPaths);
 
             // 2 convert latLng paths to be accepted to google maps polylineAPI - reduce
-            filterLatLngPaths.forEach(function(latLngThing){
-              currentPathsArr = latLngThing.geometry.paths[0];
+            filterLatLngPaths.forEach(function(feature){
+              
+              currentPathsArr = feature.geometry.paths[0];
               currentPathsArr.forEach((latLngPoint)=>{
                   latLngArr.push(createPathObj(latLngPoint));
                 })
@@ -67,7 +62,10 @@
             latLngArrMaster.forEach((latLngPath)=>{
               addPolyline2(latLngPath, 'violet');
             })
+            drawParkingPath('Friday', myJson, 'red')
+            drawParkingPath('Wednesday', myJson, 'violet')
           })
+          
       }
 
 //END FIRST RENDER MAP
@@ -87,7 +85,7 @@ function logDataFunc(){
 
 var drawMondayParkingBtn = document.getElementById('draw-new-path');
 //drawMondayParkingBtn.addEventListener('click', drawParkingPath(smArcGisData));
-drawMondayParkingBtn.addEventListener('click', drawParkingPath);
+drawMondayParkingBtn.addEventListener('click', function(){drawParkingPath('Tuesday', smArcGisData, 'lime')});
 
 var eraseMondayPath = document.getElementById('erase-monday-path');
 eraseMondayPath.addEventListener('click', eraseParkingPath)
@@ -134,7 +132,9 @@ function createPathObj(pointArr){
   return pointObj;
 }
 
-function drawParkingPath(){
+//drawParkingPath needs a data set and a day parameter
+//in order to be more dynamic
+function drawParkingPath(day, dataSet, color){
   //set variables with future types
   //
   //latLngArr - holds the smaller paths for each day,
@@ -151,7 +151,7 @@ function drawParkingPath(){
   let currentPnt = {lat: 0, lng: 0};
   let currentDay = '';
 
-  const datasetLength = smArcGisData.features.length;
+  const datasetLength = dataSet.features.length;
 
   //loop through data to
   // 1 - grab latLng paths - filter
@@ -159,8 +159,8 @@ function drawParkingPath(){
   // 3 - draw polylines on google map - forEach
 
   // 1 grab latLng paths - filter
-  currentDay = 'Tuesday';
-  let filterLatLngPaths = smArcGisData.features.filter((singlePathData)=>{
+  currentDay = day;
+  let filterLatLngPaths = dataSet.features.filter((singlePathData)=>{
       return singlePathData.attributes.DAY === currentDay;
     }
   );
@@ -179,7 +179,7 @@ function drawParkingPath(){
   })
   // 3 draw polylines on google map
   latLngArrMaster.forEach((latLngPath)=>{
-    addPolyline2(latLngPath, 'lime');
+    addPolyline2(latLngPath, color);
   })
   
 }
