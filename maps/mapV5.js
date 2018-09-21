@@ -1,4 +1,3 @@
-      //at this point drawing and erasing path functionality is implemented
       //now to add 
       // - user can select a day to see parking paths
       // - user can select a time to see parking paths
@@ -9,8 +8,6 @@
       let drawnPathsArr;
       let url = 'http://csmgisweb.smgov.net/public/rest/services/planning_update/MapServer/3/query?where=1%3D1&outFields=*&geometry=-118.477%2C34.01%2C-118.455%2C34.017&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outSR=4326&f=json'
       //alt url in similar area 'http://csmgisweb.smgov.net/public/rest/services/planning_update/MapServer/3/query?where=1%3D1&outFields=*&outSR=4326&f=json'
-
-
 
       /////////////////////////////////////////////////
       function initMap() {
@@ -31,20 +28,6 @@
 
         addMarker(wfhc);
 
-        //add polyline by whole path in latlng path array (ie not just first and last)
-
-        function addPolyline2(pathArr){
-          let path = pathArr;
-          currentParkingPath = new google.maps.Polyline({
-            path: path,
-            geodesic: true,
-            strokeColor: 'cyan',
-            strokeWeight: 2,
-            strokeOpacity: 1
-          });
-          currentParkingPath.setMap(map)
-        }
-
         fetch(url)
           .then(function(response){
             return response.json()
@@ -62,20 +45,28 @@
               return pointObj;
             }
 
-            for (var i = 0; i < myJson.features.length; i++){
-              currentPathsArr = myJson.features[i].geometry.paths[0];
-              if(myJson.features[i].attributes.DAY === 'null'){
-                currentPathsArr.forEach((latLngPoint)=>{
+            // 1 grab latLng paths - filter
+            currentDay = 'Wednesday';
+            let filterLatLngPaths = smArcGisData.features.filter((singlePathData)=>{
+                return singlePathData.attributes.DAY === currentDay;
+              }
+            );
+            console.log(filterLatLngPaths);
+
+            // 2 convert latLng paths to be accepted to google maps polylineAPI - reduce
+            filterLatLngPaths.forEach(function(latLngThing){
+              currentPathsArr = latLngThing.geometry.paths[0];
+              currentPathsArr.forEach((latLngPoint)=>{
                   latLngArr.push(createPathObj(latLngPoint));
                 })
-                latLngArrMaster.push(latLngArr);
-                latLngArr = [];
+              latLngArrMaster.push(latLngArr);
+              latLngArr = [];
+            })
 
-                latLngArrMaster.forEach((latLngPath)=>{
-                  addPolyline2(latLngPath);
-                })
-              }
-            }
+            // 3 draw polylines on google map
+            latLngArrMaster.forEach((latLngPath)=>{
+              addPolyline2(latLngPath, 'violet');
+            })
           })
       }
 
@@ -145,25 +136,22 @@ function createPathObj(pointArr){
 
 function drawParkingPath(){
   //set variables with future types
-  let currentPath = {};
-  //let currentPathsArr;
-  //latLngArr holds the smaller paths for each day,
+  //
+  //latLngArr - holds the smaller paths for each day,
   //it is destroyed after the data has been converted to object
   //that google maps polyline API needs
-  let latLngArr = [];
-  let altLatLngArr = [];
-  //latLngArrMaster holds all of the paths for the selected day
+
+  //latLngArrMaster -  holds all of the paths for the selected day
   //to be drawn
+  let currentPath = {};
+  let currentPathsArr;
+  let latLngArr = [];
   let latLngArrMaster = [];
-  let altLatLngArrMaster = [];
 
   let currentPnt = {lat: 0, lng: 0};
   let currentDay = '';
 
-  let altCurrentPathsArr;
-
   const datasetLength = smArcGisData.features.length;
-  console.log(smArcGisData);
 
   //loop through data to
   // 1 - grab latLng paths - filter
@@ -180,18 +168,20 @@ function drawParkingPath(){
 
   // 2 convert latLng paths to be accepted to google maps polylineAPI - reduce
   filterLatLngPaths.forEach(function(latLngThing){
-    altCurrentPathsArr = latLngThing.geometry.paths[0];
+    currentPathsArr = latLngThing.geometry.paths[0];
 
-    altCurrentPathsArr.forEach((latLngPoint)=>{
-        altLatLngArr.push(createPathObj(latLngPoint));
+    currentPathsArr.forEach((latLngPoint)=>{
+        latLngArr.push(createPathObj(latLngPoint));
       })
-    altLatLngArrMaster.push(altLatLngArr);
-    altLatLngArr = [];
 
-    altLatLngArrMaster.forEach((latLngPath)=>{
-      addPolyline2(latLngPath, 'lime');
-    })
+    latLngArrMaster.push(latLngArr);
+    latLngArr = [];
   })
+  // 3 draw polylines on google map
+  latLngArrMaster.forEach((latLngPath)=>{
+    addPolyline2(latLngPath, 'lime');
+  })
+  
 }
 
 function eraseParkingPath(){
@@ -199,5 +189,3 @@ function eraseParkingPath(){
     path.setMap(null);
   })
 }
-
-
