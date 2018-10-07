@@ -66,11 +66,15 @@ daySelect.addEventListener('change', function(){drawParkingPath(`${this.value}`,
 const filterThingy = document.getElementById('filter-thingy');
 
 let filterObject = {DAY: 'Wednesday', TIME:'3-5'};
-filterObject = {DAY: 'Wednesday', TIME:'3-5'};
+filterObject = {DAY: 'null'};
 filterThingy.addEventListener('click', function(){filterDataSet(smArcGisData, filterObject)});
 
 const testAPIs = document.getElementById('test-APIs');
 testAPIs.addEventListener('click', testAPIsFunc)
+
+let setupFilterAttributes = setFilterAttributes(['DAY', 'TIME']);
+const drawPathDopeFunc = document.getElementById('draw-path-dope-func');
+drawPathDopeFunc.addEventListener('click', function(){console.log(setupFilterAttributes)});
 // END EVENT LISTENERS
 //////////////////////////////////////////////////////////////////
 
@@ -162,7 +166,9 @@ function drawParkingPath(day, dataSet, color){
       }
     );
 
-  // 2 convert latLng paths to be accepted to google maps polylineAPI - reduce
+  //1.5
+
+  // 2 convert latLng paths to be accepted to google maps polylineAPI - forEach, createPathObj()
   filterLatLngPaths.forEach(function(latLngThing){
     currentPathsArr = latLngThing.geometry.paths[0];
 
@@ -178,6 +184,32 @@ function drawParkingPath(day, dataSet, color){
     addPolyline2(latLngPath, color);
   })
 }
+//=======================================================================
+//setFilterAttributes()--------------------------------------------------
+//creates an object to be passed as filterAttributes to the filterDataSet()
+//function
+//
+//when the object is created the values for keys are empty strings
+//the object keys are updated with the updateFilterAttributes() function
+//=======================================================================
+function setFilterAttributes(attributesArr){
+  let initialAttributesObj = attributesArr.reduce((filterAttributes, currentAttribute)=>{
+    filterAttributes[currentAttribute] = '';
+    return filterAttributes;
+  }, {})
+  return initialAttributesObj;
+}
+
+//=======================================================================
+//updateFilterAttributes()-----------------------------------------------
+//will run when html select dropdown is changed in order to create
+//the filterAttributes array needed for the setFilterAttributes() function
+//=======================================================================
+function updateFilterAttributes() {
+
+
+}
+
 //=======================================================================
 //filterDataSet()---------------------------------------------------------------
 //filters dataSet based on multiple feature attributes
@@ -206,6 +238,16 @@ function filterDataSet(dataSet, filterAttributes){
     return features;
   }
 }
+
+//=======================================================================
+//processLatLngData()----------------------------------------------------
+//filters dataSet based on multiple feature attributes
+//not sure if you'd ever use more than two for SM open gis data sets
+//=======================================================================
+function processLatLngData(dataSubset){
+
+}
+
 
 //=======================================================================
 //showFieldAliasOptions()------------------------------------------------
@@ -238,7 +280,7 @@ function showFieldAliasOptions(dataSet, alias, comparedAlias){
 
 //show all street sweeping DAY/TIME combinations
 //use setTimeout to wait for asynchronous call
-setTimeout(function(){showFieldAliasOptions(smArcGisData,'DAY','TIME');}, 3000);
+setTimeout(function(){showFieldAliasOptions(smArcGisData,'TIME');}, 3000);
 
   
 //=======================================================================
