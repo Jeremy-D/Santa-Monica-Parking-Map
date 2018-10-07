@@ -58,7 +58,7 @@ var drawMondayParkingBtn = document.getElementById('draw-new-path');
 drawMondayParkingBtn.addEventListener('click', function(){drawParkingPath('Tuesday', smArcGisData, 'lime')});
 
 var eraseMondayPath = document.getElementById('erase-monday-path');
-eraseMondayPath.addEventListener('click', eraseParkingPath)
+eraseMondayPath.addEventListener('click', eraseParkingPath);
 
 const daySelect = document.getElementById('day-select');
 daySelect.addEventListener('change', function(){drawParkingPath(`${this.value}`, smArcGisData, 'blue')})
@@ -66,6 +66,7 @@ daySelect.addEventListener('change', function(){drawParkingPath(`${this.value}`,
 const filterThingy = document.getElementById('filter-thingy');
 
 let filterObject = {DAY: 'Wednesday', TIME:'3-5'};
+filterObject = {DAY: 'Wednesday', TIME:'3-5'};
 filterThingy.addEventListener('click', function(){filterDataSet(smArcGisData, filterObject)});
 
 const testAPIs = document.getElementById('test-APIs');
@@ -87,8 +88,12 @@ fetch('http://csmgisweb.smgov.net/public/rest/services/planning_update/MapServer
       //data is an object
       smArcGisData = data;
     })
-
-//draw polylines method----------------------------------------
+//=======================================================================
+//addPolyline2()----------------------------------------
+//second iteration of drawing polylines
+//possibly can update with options for getting information when hovering 
+//over already drawn paths
+//=======================================================================
 function addPolyline2(pathArr, color){
   currentParkingPath = new google.maps.Polyline({
     path: pathArr,
@@ -102,19 +107,27 @@ function addPolyline2(pathArr, color){
   //actually draw polyline
   currentParkingPath.setMap(map);
 }
+//=======================================================================
 //CONVERT LAT LNG data------------------------------------------
 //lat long data from the Santa Monica GIS is an array of two
 //lat long points, this data needs to be converted into an object
 //so that google maps polyline API can read the data 
+//this function is used in the drawParkingPath() function
+//=======================================================================
 function createPathObj(pointArr){
   let pointObj = {lat:0, lng:0};
   pointObj.lat = pointArr[1];
   pointObj.lng = pointArr[0];
   return pointObj;
 }
-
-//drawParkingPath needs a data set and a day parameter
-//in order to be more dynamic
+//=======================================================================
+//drawParkingPath()------------------------------------------------------
+//drawParkingPath 
+// -sorts the data based on 1 feature attribute, 
+// -parses the lat lng data into google maps friendly format
+// - draws the polylines on the map & stores the data to erase the paths
+//
+//=======================================================================
 function drawParkingPath(day, dataSet, color){
   //set variables with future types
   //
@@ -165,7 +178,11 @@ function drawParkingPath(day, dataSet, color){
     addPolyline2(latLngPath, color);
   })
 }
-
+//=======================================================================
+//filterDataSet()---------------------------------------------------------------
+//filters dataSet based on multiple feature attributes
+//not sure if you'd ever use more than two for SM open gis data sets
+//=======================================================================
 function filterDataSet(dataSet, filterAttributes){
   //filterAtributes needs to be an object
   //we'll do a -> features.filter(filterAtributes)
@@ -190,11 +207,14 @@ function filterDataSet(dataSet, filterAttributes){
   }
 }
 
+//=======================================================================
+//showFieldAliasOptions()------------------------------------------------
 //showFieldAliasOptions() allows the developer to see the combination of field
 //aliases that can be used in the filterDataSet() function
 //a simple example is seeing all of the options for DAY and TIME
 //but other insights can be gained by comparing various field aliases 
 //from the database
+//=======================================================================
 function showFieldAliasOptions(dataSet, alias, comparedAlias){
   features = dataSet.features;
 
@@ -221,7 +241,14 @@ function showFieldAliasOptions(dataSet, alias, comparedAlias){
 setTimeout(function(){showFieldAliasOptions(smArcGisData,'DAY','TIME');}, 3000);
 
   
-
+//=======================================================================
+//eraseParkingPath()------------------------------------------------
+//the pathsToErase array is created when polylines are drawn in the
+//addPolyline2() function, eraseParkingPath() references that array in 
+//order to erase polylines by setting the Map of the path to null
+//
+//need to rename for general use
+//=======================================================================
 function eraseParkingPath(){
   pathsToErase.forEach((path)=>{
     path.setMap(null);
