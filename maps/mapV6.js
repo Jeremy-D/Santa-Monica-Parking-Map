@@ -1,8 +1,7 @@
       //now to add 
-      // - user can select a day to see parking paths
-      // - user can select a time to see parking paths
-      // - refactor code to make easier to work with
-      // - use oop principles to abstract functions with data injection
+      // extract reusable functions from drawParkingPath()
+      // refactor ux so that map draws available parking places first
+      // think of how to implement location ranking
       let map;
       let currentParkingPath;
       let drawnPathsArr;
@@ -33,7 +32,6 @@
             return response.json()
           })
           .then(function(myJson){
-            console.log(myJson)
             drawParkingPath('Friday', myJson, 'red')
             drawParkingPath('Wednesday', myJson, 'violet')
           })
@@ -64,6 +62,14 @@ eraseMondayPath.addEventListener('click', eraseParkingPath)
 
 const daySelect = document.getElementById('day-select');
 daySelect.addEventListener('change', function(){drawParkingPath(`${this.value}`, smArcGisData, 'blue')})
+
+const filterThingy = document.getElementById('filter-thingy');
+
+let filterObject = {DAY: 'Wednesday', TIME:'3-5'};
+filterThingy.addEventListener('click', function(){filterDataSet(smArcGisData, filterObject)});
+
+const testAPIs = document.getElementById('test-APIs');
+testAPIs.addEventListener('click', testAPIsFunc)
 // END EVENT LISTENERS
 //////////////////////////////////////////////////////////////////
 
@@ -110,7 +116,6 @@ function createPathObj(pointArr){
 //drawParkingPath needs a data set and a day parameter
 //in order to be more dynamic
 function drawParkingPath(day, dataSet, color){
-  console.log(dataSet);
   //set variables with future types
   //
   //latLngArr - holds the smaller paths for each day,
@@ -127,8 +132,6 @@ function drawParkingPath(day, dataSet, color){
   let currentPnt = {lat: 0, lng: 0};
   let currentDay = '';
 
-  const datasetLength = dataSet.features.length;
-
   //loop through data to
   // 1 - grab latLng paths - filter
   // 2 - convert latLng paths to be accepted to google maps polyline API - forEach/callback
@@ -137,18 +140,14 @@ function drawParkingPath(day, dataSet, color){
   // 1 grab latLng paths - filter
   currentDay = day;
 
-  if (day == "Null"){
+  if (day === "Null"){
     currentDay = "null"
   }
-
-  console.log(currentDay);
   
     let filterLatLngPaths = dataSet.features.filter((singlePathData)=>{
         return singlePathData.attributes.DAY === currentDay;
       }
     );
-    console.log(filterLatLngPaths);
-
 
   // 2 convert latLng paths to be accepted to google maps polylineAPI - reduce
   filterLatLngPaths.forEach(function(latLngThing){
@@ -165,11 +164,97 @@ function drawParkingPath(day, dataSet, color){
   latLngArrMaster.forEach((latLngPath)=>{
     addPolyline2(latLngPath, color);
   })
+}
+
+function filterDataSet(dataSet, filterAttributes){
+  //filterAtributes needs to be an object
+  //we'll do a -> features.filter(filterAtributes)
+  //filter multiple attributes in the object
+  //else throw error 
+
+
+
+  //remember to validate filterAtributes
+  let attributesValid = true;
+  console.log(dataSet);
+
+  let fieldAliases = dataSet.fieldAliases;
+  console.log(filterAttributes)
+  console.log(fieldAliases);
+
+ 
+//---------------------------------------------------------------------------------
   
+
+  let features = dataSet.features;
+  //console.log(features);
+
+  //show all streetsweeping combinations
+  let attributes;
+  //showFieldAliasOptions allows the developer to see the combination of field
+  //aliases that can be used in the filterDataSet() function
+  //a simple example is seeing all of the options for DAY and TIME
+  //but other insights can be gained by comparing various field aliases 
+  //from the database
+  //
+  //need to take this function out of filterDataSet() function
+  //i was being lazy ¯\_(ツ)_/¯
+  function showFieldAliasOptions(alias, comparedAlias){
+    let daysAndTimes = {};
+    features.forEach((feature)=>{
+      attributes = feature.attributes;
+      if (daysAndTimes[attributes[alias]] == undefined){
+        daysAndTimes[attributes[alias]] = [];
+        daysAndTimes[attributes[alias]].push(attributes[comparedAlias]); 
+      } 
+
+      if (daysAndTimes[attributes[alias]].indexOf(attributes[comparedAlias]) === -1){
+        daysAndTimes[attributes[alias]].push(attributes[comparedAlias])
+      } 
+    })
+
+    console.log('you crazy kids!');
+    console.log(daysAndTimes);
+  };
+  showFieldAliasOptions('DAY', 'TIME');
+  showFieldAliasOptions('SWEEP0_ID', 'DAY');
+  //showFieldAliasOptions('TIME', 'DAY');
+  //showFieldAliasOptions('DAY', 'LENGTH');
+  //showFieldAliasOptions('TIME');
+
+  if(attributesValid === true){
+    features = features.filter(function(feature){
+        for(var key in filterAttributes){
+          if (feature.attributes[key] == undefined || feature.attributes[key] != filterAttributes[key])
+            return false;
+        }
+        return true;
+      });
+    console.log(features);
+  }
+
+  
+
+
+  // console.log(features);
+  // dataSet.features.filter((singlePathData)=>{
+  //   console.log(singlePathData.attributes.filterAtribute)
+  // })
 }
 
 function eraseParkingPath(){
   pathsToErase.forEach((path)=>{
     path.setMap(null);
   })
+}
+
+function testAPIsFunc(){
+  let APIurl = "https://csmgisweb.smgov.net/csmgis01/rest/services/environment/watersheds/MapServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json";
+  fetch(APIurl)
+    .then(function(response){
+      return response.json()
+    })
+    .then(function(myJson){
+      console.log(myJson);
+    })
 }

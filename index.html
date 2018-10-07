@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Simple Map</title>
+    <title>Santa Monica Parking</title>
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
     <style>
@@ -23,7 +23,12 @@
     <button id="log-data">Log Data</button>
     <button id="draw-new-path">Draw Monday</button>
     <button id="erase-monday-path">Erase Monday</button>
-    <select>
+    <button id="filter-thingy">All the filters! filterDataSet()</button>
+    <button id="test-APIs">Test APIs</button>
+
+    <select id="day-select">
+      <option id="mwf">MWF</option>
+      <option id="tr-sat">TRSat</option>
       <option id="monday">Monday</option>
       <option id="tuesday">Tuesday</option>
       <option id="wednesday">Wednesday</option>
@@ -35,7 +40,7 @@
     </select>
 
 
-    <script type="text/javascript" src="maps/mapV5.js"></script>
+    <script type="text/javascript" src="maps/mapV6.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCU1RvZAh_d4TPH07kiqHiZku0cpIqFLXI&callback=initMap"
     async defer></script>
     <script type="text/javascript" src="streetSweeping.js"></script>
