@@ -172,55 +172,10 @@ function filterDataSet(dataSet, filterAttributes){
   //filter multiple attributes in the object
   //else throw error 
 
-
-
   //remember to validate filterAtributes
   let attributesValid = true;
-  console.log(dataSet);
-
   let fieldAliases = dataSet.fieldAliases;
-  console.log(filterAttributes)
-  console.log(fieldAliases);
-
- 
-//---------------------------------------------------------------------------------
-  
-
   let features = dataSet.features;
-  //console.log(features);
-
-  //show all streetsweeping combinations
-  let attributes;
-  //showFieldAliasOptions allows the developer to see the combination of field
-  //aliases that can be used in the filterDataSet() function
-  //a simple example is seeing all of the options for DAY and TIME
-  //but other insights can be gained by comparing various field aliases 
-  //from the database
-  //
-  //need to take this function out of filterDataSet() function
-  //i was being lazy ¯\_(ツ)_/¯
-  function showFieldAliasOptions(alias, comparedAlias){
-    let daysAndTimes = {};
-    features.forEach((feature)=>{
-      attributes = feature.attributes;
-      if (daysAndTimes[attributes[alias]] == undefined){
-        daysAndTimes[attributes[alias]] = [];
-        daysAndTimes[attributes[alias]].push(attributes[comparedAlias]); 
-      } 
-
-      if (daysAndTimes[attributes[alias]].indexOf(attributes[comparedAlias]) === -1){
-        daysAndTimes[attributes[alias]].push(attributes[comparedAlias])
-      } 
-    })
-
-    console.log('you crazy kids!');
-    console.log(daysAndTimes);
-  };
-  showFieldAliasOptions('DAY', 'TIME');
-  showFieldAliasOptions('SWEEP0_ID', 'DAY');
-  //showFieldAliasOptions('TIME', 'DAY');
-  //showFieldAliasOptions('DAY', 'LENGTH');
-  //showFieldAliasOptions('TIME');
 
   if(attributesValid === true){
     features = features.filter(function(feature){
@@ -231,16 +186,41 @@ function filterDataSet(dataSet, filterAttributes){
         return true;
       });
     console.log(features);
+    return features;
   }
+}
+
+//showFieldAliasOptions() allows the developer to see the combination of field
+//aliases that can be used in the filterDataSet() function
+//a simple example is seeing all of the options for DAY and TIME
+//but other insights can be gained by comparing various field aliases 
+//from the database
+function showFieldAliasOptions(dataSet, alias, comparedAlias){
+  features = dataSet.features;
+
+  let daysAndTimes = {};
+  features.forEach((feature)=>{
+    attributes = feature.attributes;
+
+    if (daysAndTimes[attributes[alias]] == undefined){
+      daysAndTimes[attributes[alias]] = [];
+      daysAndTimes[attributes[alias]].push(attributes[comparedAlias]); 
+    } 
+
+    if (daysAndTimes[attributes[alias]].indexOf(attributes[comparedAlias]) === -1){
+      daysAndTimes[attributes[alias]].push(attributes[comparedAlias])
+    } 
+  })
+
+  console.log('you crazy kids!');
+  console.log(daysAndTimes);
+};
+
+//show all street sweeping DAY/TIME combinations
+//use setTimeout to wait for asynchronous call
+setTimeout(function(){showFieldAliasOptions(smArcGisData,'DAY','TIME');}, 3000);
 
   
-
-
-  // console.log(features);
-  // dataSet.features.filter((singlePathData)=>{
-  //   console.log(singlePathData.attributes.filterAtribute)
-  // })
-}
 
 function eraseParkingPath(){
   pathsToErase.forEach((path)=>{
