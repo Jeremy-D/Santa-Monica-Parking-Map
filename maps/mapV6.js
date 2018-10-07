@@ -61,7 +61,11 @@ var eraseMondayPath = document.getElementById('erase-monday-path');
 eraseMondayPath.addEventListener('click', eraseParkingPath);
 
 const daySelect = document.getElementById('day-select');
-daySelect.addEventListener('change', function(){drawParkingPath(`${this.value}`, smArcGisData, 'blue')})
+//daySelect.addEventListener('change', function(){drawParkingPath(`${this.value}`, smArcGisData, 'blue')})
+daySelect.addEventListener('change', function(){updateFilterAttributes(setupFilterAttributes, 'DAY', this.value)})
+
+const timeSelect = document.getElementById('time-select');
+timeSelect.addEventListener('change', function(){updateFilterAttributes(setupFilterAttributes, 'TIME', this.value)})
 
 const filterThingy = document.getElementById('filter-thingy');
 
@@ -73,8 +77,11 @@ const testAPIs = document.getElementById('test-APIs');
 testAPIs.addEventListener('click', testAPIsFunc)
 
 let setupFilterAttributes = setFilterAttributes(['DAY', 'TIME']);
+
 const drawPathDopeFunc = document.getElementById('draw-path-dope-func');
-drawPathDopeFunc.addEventListener('click', function(){console.log(setupFilterAttributes)});
+drawPathDopeFunc.addEventListener('click', function(){
+  filterDataSet(smArcGisData, setupFilterAttributes);
+});
 // END EVENT LISTENERS
 //////////////////////////////////////////////////////////////////
 
@@ -204,10 +211,15 @@ function setFilterAttributes(attributesArr){
 //updateFilterAttributes()-----------------------------------------------
 //will run when html select dropdown is changed in order to create
 //the filterAttributes array needed for the setFilterAttributes() function
+// - takes an object{}, 
+// - takes an attribute as a string, convention with this dataset seems to be a string 
+//   in all caps for attribute names
+// - takes a value, currently string but could possibly be something else for other
+//   datasets, use case as this.value
 //=======================================================================
-function updateFilterAttributes() {
-
-
+function updateFilterAttributes(attributesObj, attribute, value) {
+  attributesObj[attribute] = value;
+  console.log(attributesObj);
 }
 
 //=======================================================================
