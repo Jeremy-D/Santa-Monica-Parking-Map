@@ -80,7 +80,7 @@ let setupFilterAttributes = setFilterAttributes(['DAY', 'TIME']);
 
 const drawPathDopeFunc = document.getElementById('draw-path-dope-func');
 drawPathDopeFunc.addEventListener('click', function(){
-  filterDataSet(smArcGisData, setupFilterAttributes);
+  drawParkingPath('whatever', smArcGisData, 'purple', setupFilterAttributes);
 });
 // END EVENT LISTENERS
 //////////////////////////////////////////////////////////////////
@@ -139,7 +139,7 @@ function createPathObj(pointArr){
 // - draws the polylines on the map & stores the data to erase the paths
 //
 //=======================================================================
-function drawParkingPath(day, dataSet, color){
+function drawParkingPath(day, dataSet, color, filterAttributes){
   //set variables with future types
   //
   //latLngArr - holds the smaller paths for each day,
@@ -164,16 +164,22 @@ function drawParkingPath(day, dataSet, color){
   // 1 grab latLng paths - filter
   currentDay = day;
 
-  if (day === "Null"){
-    currentDay = "null"
-  }
-  
-    let filterLatLngPaths = dataSet.features.filter((singlePathData)=>{
-        return singlePathData.attributes.DAY === currentDay;
-      }
-    );
+  // if (day === "Null"){
+  //   currentDay = "null"
+  // }
+
+  // let filterLatLngPaths = dataSet.features.filter((singlePathData)=>{
+  //     return singlePathData.attributes.DAY === currentDay;
+  //   }
+  // );
+
 
   //1.5
+  if(filterAttributes){
+    filterLatLngPaths = filterDataSet(dataSet, filterAttributes);
+    console.log(filterLatLngPaths);
+  }
+
 
   // 2 convert latLng paths to be accepted to google maps polylineAPI - forEach, createPathObj()
   filterLatLngPaths.forEach(function(latLngThing){
@@ -186,6 +192,7 @@ function drawParkingPath(day, dataSet, color){
     latLngArrMaster.push(latLngArr);
     latLngArr = [];
   })
+
   // 3 draw polylines on google map
   latLngArrMaster.forEach((latLngPath)=>{
     addPolyline2(latLngPath, color);
@@ -233,7 +240,24 @@ function filterDataSet(dataSet, filterAttributes){
   //filter multiple attributes in the object
   //else throw error 
 
-  //remember to validate filterAtributes
+  console.log(filterAttributes);
+  //sanitize filterAtributes... kinda
+  function cleanFilterAttributes(filterAttributes){
+    for(var attribute in filterAttributes){
+      if(filterAttributes[attribute]==false){
+        delete filterAttributes[attribute];
+      }
+    }
+    console.log(filterAttributes);
+    return filterAttributes;
+  }
+  let sanitizeAttributes = cleanFilterAttributes(filterAttributes);
+
+
+ console.log(sanitizeAttributes);
+
+
+  
   let attributesValid = true;
   let fieldAliases = dataSet.fieldAliases;
   let features = dataSet.features;
@@ -246,7 +270,7 @@ function filterDataSet(dataSet, filterAttributes){
         }
         return true;
       });
-    console.log(features);
+    //console.log(features);
     return features;
   }
 }
