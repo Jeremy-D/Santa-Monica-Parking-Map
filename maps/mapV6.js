@@ -32,8 +32,8 @@
             return response.json()
           })
           .then(function(myJson){
-            drawParkingPath('Friday', myJson, 'red')
-            drawParkingPath('Wednesday', myJson, 'violet')
+            drawParkingPath(myJson, 'red', {'DAY':'Friday'})
+            drawParkingPath(myJson, 'violet', {'DAY':'Wednesday'})
           })
           
       }
@@ -55,7 +55,7 @@ function logDataFunc(){
 
 var drawMondayParkingBtn = document.getElementById('draw-new-path');
 //drawMondayParkingBtn.addEventListener('click', drawParkingPath(smArcGisData));
-drawMondayParkingBtn.addEventListener('click', function(){drawParkingPath('Tuesday', smArcGisData, 'lime')});
+drawMondayParkingBtn.addEventListener('click', function(){drawParkingPath(smArcGisData, 'lime')});
 
 var eraseMondayPath = document.getElementById('erase-monday-path');
 eraseMondayPath.addEventListener('click', eraseParkingPath);
@@ -80,7 +80,7 @@ let setupFilterAttributes = setFilterAttributes(['DAY', 'TIME']);
 
 const drawPathDopeFunc = document.getElementById('draw-path-dope-func');
 drawPathDopeFunc.addEventListener('click', function(){
-  drawParkingPath('whatever', smArcGisData, 'purple', setupFilterAttributes);
+  drawParkingPath(smArcGisData, 'purple', setupFilterAttributes);
 });
 // END EVENT LISTENERS
 //////////////////////////////////////////////////////////////////
@@ -139,7 +139,7 @@ function createPathObj(pointArr){
 // - draws the polylines on the map & stores the data to erase the paths
 //
 //=======================================================================
-function drawParkingPath(day, dataSet, color, filterAttributes){
+function drawParkingPath(dataSet, color, filterAttributes){
   //set variables with future types
   //
   //latLngArr - holds the smaller paths for each day,
@@ -162,24 +162,7 @@ function drawParkingPath(day, dataSet, color, filterAttributes){
   // 3 - draw polylines on google map - forEach
 
   // 1 grab latLng paths - filter
-  currentDay = day;
-
-  // if (day === "Null"){
-  //   currentDay = "null"
-  // }
-
-  // let filterLatLngPaths = dataSet.features.filter((singlePathData)=>{
-  //     return singlePathData.attributes.DAY === currentDay;
-  //   }
-  // );
-
-
-  //1.5
-  if(filterAttributes){
-    filterLatLngPaths = filterDataSet(dataSet, filterAttributes);
-    console.log(filterLatLngPaths);
-  }
-
+  filterLatLngPaths = filterDataSet(dataSet, filterAttributes);
 
   // 2 convert latLng paths to be accepted to google maps polylineAPI - forEach, createPathObj()
   filterLatLngPaths.forEach(function(latLngThing){
@@ -240,7 +223,6 @@ function filterDataSet(dataSet, filterAttributes){
   //filter multiple attributes in the object
   //else throw error 
 
-  console.log(filterAttributes);
   //sanitize filterAtributes... kinda
   function cleanFilterAttributes(filterAttributes){
     for(var attribute in filterAttributes){
@@ -248,15 +230,10 @@ function filterDataSet(dataSet, filterAttributes){
         delete filterAttributes[attribute];
       }
     }
-    console.log(filterAttributes);
     return filterAttributes;
   }
+
   let sanitizeAttributes = cleanFilterAttributes(filterAttributes);
-
-
- console.log(sanitizeAttributes);
-
-
   
   let attributesValid = true;
   let fieldAliases = dataSet.fieldAliases;
@@ -270,7 +247,6 @@ function filterDataSet(dataSet, filterAttributes){
         }
         return true;
       });
-    //console.log(features);
     return features;
   }
 }
@@ -334,12 +310,26 @@ function eraseParkingPath(){
 }
 
 function testAPIsFunc(){
+  // change this line -> currentPathsArr = latLngThing.geometry.paths[0];
+  // to this -> currentPathsArr = latLngThing.geometry.rings[0];
+  // for some datasets
   let APIurl = "https://csmgisweb.smgov.net/csmgis01/rest/services/environment/watersheds/MapServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json";
+  APIurl = "http://csmgisweb.smgov.net/public/rest/services/bike_network/MapServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
   fetch(APIurl)
     .then(function(response){
       return response.json()
     })
     .then(function(myJson){
-      console.log(myJson);
+      //watershed data
+      // showFieldAliasOptions(myJson, 'WATERSHED')
+      // drawParkingPath(myJson, 'blue', {WATERSHED:'San Vicente'});
+      console.log(myJson)
+      for (var key in myJson.fieldAliases){
+        console.log(key);
+        showFieldAliasOptions(myJson, key);
+      }
+      // myJson.fieldAliases.forEach((attribute)=>{
+      //   showFieldAliasOptions(myJson, attribute);
+      // })
     })
 }
