@@ -147,56 +147,26 @@ function createPathObj(pointArr){
 //=======================================================================
 function drawParkingPath(dataSet, color, filterAttributes){
   //set variables with future types
-  //
-  //latLngArr - holds the smaller paths for each day,
-  //it is destroyed after the data has been converted to object
-  //that google maps polyline API needs
-
-  //latLngArrMaster -  holds all of the paths for the selected day
-  //to be drawn
-  let currentPathsArr;
-  let latLngArr = [];
-  let latLngArrMaster = [];
 
   //loop through data to
-  // 1 - grab latLng paths - filter
-  // 2 - convert latLng paths to be accepted to google maps polyline API - forEach/callback
-  // 3 - draw polylines on google map - forEach
+  // 1 - grab latLng paths -
+  //   - uses filterDataSet()
+  // 2 - convert latLng paths to be accepted to google maps polyline API 
+  //   - uses processLatLngData()
+  // 3 - draw polylines on google map 
+  //   - uses forEach, addPolyline2()
 
   // 1 grab latLng paths - filter
-  filterLatLngPaths = filterDataSet(dataSet, filterAttributes);
+  let filterLatLngPaths = filterDataSet(dataSet, filterAttributes);
 
   // 2 convert latLng paths to be accepted to google maps polylineAPI - forEach, createPathObj()
-  filterLatLngPaths.forEach(function(latLngThing){
-    //this line needs to account for if the paths array has more than one item,
-    //sidenote, why does the paths array have more than one item??
-    currentPathsArr = latLngThing.geometry.paths[0];
-    //console.log(latLngThing.geometry);
-    //console.log('the length is ' + latLngThing.geometry.paths.length);
-
-    currentPathsArr.forEach((latLngPoint)=>{
-        latLngArr.push(createPathObj(latLngPoint));
-      })
-
-    latLngArrMaster.push(latLngArr);
-    latLngArr = [];
-  })
-
-  let noNewFriends = processLatLngData(filterLatLngPaths);
-  setTimeout( function(){noNewFriends.forEach((latLngPath)=>{
-    addPolyline2(latLngPath, 'blue');
-  })}, 1000)
-
   let friendlyLatLngData = processLatLngData(filterLatLngPaths);
-  friendlyLatLngData.forEach((latLngPath)=>{
-    addPolyline2(latLngPath, 'cyan');
-  })
-
   // 3 draw polylines on google map
-  latLngArrMaster.forEach((latLngPath)=>{
+  friendlyLatLngData.forEach((latLngPath)=>{
     addPolyline2(latLngPath, color);
   })
 }
+
 //=======================================================================
 //setFilterAttributes()--------------------------------------------------
 //creates an object to be passed as filterAttributes to the filterDataSet()
@@ -280,6 +250,13 @@ function processLatLngData(dataSubset){
   //dataSubset = filterDataSet(dataSubset);
   //console.log(dataSubset);
   // set up local variables
+
+  //latLngArr - holds the smaller paths for each day,
+  //it is destroyed after the data has been converted to object
+  //that google maps polyline API needs
+
+  //latLngArrMaster -  holds all of the paths for the selected day
+  //to be drawn
   let currentPathsArr = [];
   let latLngArr = [];
   let latLngArrMaster = [];
@@ -313,14 +290,6 @@ function processLatLngData(dataSubset){
       latLngArrMaster.push(latLngArr);
       latLngArr = [];
     })
-    //console.log(latLngArrMaster)
-
-    // currentPathsArr = dataSubsetItem.geometry[pathType][0];
-    // currentPathsArr.forEach((latLngPoint)=>{
-    //   latLngArr.push(createPathObj(latLngPoint));
-    // })
-    // latLngArrMaster.push(latLngArr);
-    // latLngArr = [];
   })
   console.log(latLngArrMaster);
   return latLngArrMaster;
