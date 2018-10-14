@@ -82,6 +82,12 @@ const drawPathDopeFunc = document.getElementById('draw-path-dope-func');
 drawPathDopeFunc.addEventListener('click', function(){
   drawParkingPath(smArcGisData, 'purple', setupFilterAttributes);
 });
+//test processLatLngData()
+const processLatLngDataTest = document.getElementById('process-lat-lng-data');
+processLatLngDataTest.addEventListener('click', function(){
+  processLatLngData(smArcGisData);
+})
+
 // END EVENT LISTENERS
 //////////////////////////////////////////////////////////////////
 
@@ -165,8 +171,8 @@ function drawParkingPath(dataSet, color, filterAttributes){
     //this line needs to account for if the paths array has more than one item,
     //sidenote, why does the paths array have more than one item??
     currentPathsArr = latLngThing.geometry.paths[0];
-    console.log(latLngThing.geometry);
-    console.log('the length is ' + latLngThing.geometry.paths.length);
+    //console.log(latLngThing.geometry);
+    //console.log('the length is ' + latLngThing.geometry.paths.length);
 
     currentPathsArr.forEach((latLngPoint)=>{
         latLngArr.push(createPathObj(latLngPoint));
@@ -174,6 +180,16 @@ function drawParkingPath(dataSet, color, filterAttributes){
 
     latLngArrMaster.push(latLngArr);
     latLngArr = [];
+  })
+
+  let noNewFriends = processLatLngData(filterLatLngPaths);
+  setTimeout( function(){noNewFriends.forEach((latLngPath)=>{
+    addPolyline2(latLngPath, 'blue');
+  })}, 1000)
+
+  let friendlyLatLngData = processLatLngData(filterLatLngPaths);
+  friendlyLatLngData.forEach((latLngPath)=>{
+    addPolyline2(latLngPath, 'cyan');
   })
 
   // 3 draw polylines on google map
@@ -253,31 +269,62 @@ function filterDataSet(dataSet, filterAttributes){
 
 //=======================================================================
 //processLatLngData()----------------------------------------------------
-//filters dataSet based on multiple feature attributes
-//not sure if you'd ever use more than two for SM open gis data sets
+//takes a dataSet or dataSubset from filterDataSet and process the data
+//so that the data is in a google maps friendly format so that polylines
+//can be drawn
+//
+//dataSubset needs to be first passed through filterDataset
 //=======================================================================
 function processLatLngData(dataSubset){
-  // let currentPathsArr = [];
-  // let latLngArr = [];
-  // let latLngArrMaster = [];
-  //
-  //
+  // filterDataSet() call test for friday, remove in production
+  //dataSubset = filterDataSet(dataSubset);
+  //console.log(dataSubset);
+  // set up local variables
+  let currentPathsArr = [];
+  let latLngArr = [];
+  let latLngArrMaster = [];
+  let pathType = '';
+
+  //determine pathType
   //check if the array dataSubset.geometry.paths exists
   //if it doesn't exist check if dataSubset.geometry.rings exists
-  //
-  //check how many items are in paths or rings
-  //for each item in the array set the array item to currentPathsArr
-  //
-  //currentPathsArr.forEach((latLngPoint)=>{
-  //      latLngArr.push(createPathObj(latLngPoint));
-  //    })
-  // latLngArrMaster.push(latLngArr);
-  // latLngArr = [];
+  // check if something else beside paths or rings exists and return that
+  if(dataSubset[0].geometry.paths.length > 0){
+    pathType = 'paths';
+  } else if(dataSubset[0].geometry.rings.length > 0){
+    pathType = 'rings';
+  } else {
+    console.log('this data set is not supported');
+    console.log('please create an issue on this repo to support this dataset');
+    console.log(dataSubset.geometry);
+  }
 
-  // return latLngArrMaster;
+  let itemLength = 0;
+  let subPaths = [];
+  dataSubset.forEach((dataSubsetItem)=>{
+    console.log(dataSubsetItem.geometry[pathType].length);
+    itemLength = dataSubsetItem.geometry[pathType].length;
+    subPaths = dataSubsetItem.geometry[pathType]
+    subPaths.forEach((path)=>{
+      currentPathsArr = path;
+      path.forEach((latLngPoint)=>{
+        latLngArr.push(createPathObj(latLngPoint))
+      })
+      latLngArrMaster.push(latLngArr);
+      latLngArr = [];
+    })
+    //console.log(latLngArrMaster)
 
+    // currentPathsArr = dataSubsetItem.geometry[pathType][0];
+    // currentPathsArr.forEach((latLngPoint)=>{
+    //   latLngArr.push(createPathObj(latLngPoint));
+    // })
+    // latLngArrMaster.push(latLngArr);
+    // latLngArr = [];
+  })
+  console.log(latLngArrMaster);
+  return latLngArrMaster;
 }
-
 
 //=======================================================================
 //showFieldAliasOptions()------------------------------------------------
