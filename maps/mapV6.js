@@ -148,13 +148,9 @@ function drawParkingPath(dataSet, color, filterAttributes){
 
   //latLngArrMaster -  holds all of the paths for the selected day
   //to be drawn
-  let currentPath = {};
   let currentPathsArr;
   let latLngArr = [];
   let latLngArrMaster = [];
-
-  let currentPnt = {lat: 0, lng: 0};
-  let currentDay = '';
 
   //loop through data to
   // 1 - grab latLng paths - filter
@@ -166,7 +162,11 @@ function drawParkingPath(dataSet, color, filterAttributes){
 
   // 2 convert latLng paths to be accepted to google maps polylineAPI - forEach, createPathObj()
   filterLatLngPaths.forEach(function(latLngThing){
+    //this line needs to account for if the paths array has more than one item,
+    //sidenote, why does the paths array have more than one item??
     currentPathsArr = latLngThing.geometry.paths[0];
+    console.log(latLngThing.geometry);
+    console.log('the length is ' + latLngThing.geometry.paths.length);
 
     currentPathsArr.forEach((latLngPoint)=>{
         latLngArr.push(createPathObj(latLngPoint));
@@ -257,6 +257,24 @@ function filterDataSet(dataSet, filterAttributes){
 //not sure if you'd ever use more than two for SM open gis data sets
 //=======================================================================
 function processLatLngData(dataSubset){
+  // let currentPathsArr = [];
+  // let latLngArr = [];
+  // let latLngArrMaster = [];
+  //
+  //
+  //check if the array dataSubset.geometry.paths exists
+  //if it doesn't exist check if dataSubset.geometry.rings exists
+  //
+  //check how many items are in paths or rings
+  //for each item in the array set the array item to currentPathsArr
+  //
+  //currentPathsArr.forEach((latLngPoint)=>{
+  //      latLngArr.push(createPathObj(latLngPoint));
+  //    })
+  // latLngArrMaster.push(latLngArr);
+  // latLngArr = [];
+
+  // return latLngArrMaster;
 
 }
 
