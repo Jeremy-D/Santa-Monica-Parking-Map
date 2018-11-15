@@ -91,12 +91,13 @@ function createPathObj(pointArr) {
 //=======================================================================
 //drawParkingPath()------------------------------------------------------
 //drawParkingPath
-// -sorts the data based on 1 feature attribute,
-// -parses the lat lng data into google maps friendly format
+// - sorts the data based on 1 feature attribute,
+// - parses the lat lng data into google maps friendly format
 // - draws the polylines on the map & stores the data to erase the paths
 //
 //=======================================================================
 function drawParkingPath(dataSet, color, filterAttributes) {
+  console.log(dataSet);
   //set variables with future types
 
   //loop through data to
@@ -120,7 +121,7 @@ function drawParkingPath(dataSet, color, filterAttributes) {
 
 //=======================================================================
 //setFilterAttributes()--------------------------------------------------
-//creates an object to be passed as filterAttributes to the filterDataSet()
+//creates an object from an array to be passed as filterAttributes to the filterDataSet()
 //function
 //
 //when the object is created the values for keys are empty strings
@@ -142,7 +143,7 @@ function setFilterAttributes(attributesArr) {
 // - takes an attribute as a string, convention with this dataset seems to be a string
 //   in all caps for attribute names
 // - takes a value, currently string but could possibly be something else for other
-//   datasets, use case as this.value
+//   datasets, use this.value for the implemented dropdown
 //=======================================================================
 function updateFilterAttributes(attributesObj, attribute, value) {
   attributesObj[attribute] = value;
@@ -155,7 +156,7 @@ function updateFilterAttributes(attributesObj, attribute, value) {
 //=======================================================================
 function filterDataSet(dataSet, filterAttributes) {
   //filterAtributes needs to be an object
-  //we'll do a -> features.filter(filterAtributes)
+  //need to run features.filter(filterAtributes)
   //filter multiple attributes in the object
   //else throw error
 
