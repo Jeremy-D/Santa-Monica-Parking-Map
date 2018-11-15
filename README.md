@@ -1,0 +1,2 @@
+## Santa Monica GIS Data Visualization
+This project started out as a way to make parking easier for our clients. It is turning into a library to visualize open data from [Santa Monica GIS Data Portal](https://gis-smgov.opendata.arcgis.com/datasets/299cd32301b34e1792812ce8b5c30fe7_3/geoservice). The library uses fetch to get the data as a JSON object, then parses the data to work with the Google Maps API.
