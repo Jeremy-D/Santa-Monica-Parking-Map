@@ -23,14 +23,17 @@ fetch(
 //second iteration of drawing polylines
 //possibly can update with options for getting information when hovering
 //over already drawn paths
+//
+//add z index option
 //=======================================================================
-function addPolyline(pathArr, color) {
+function addPolyline(pathArr, color, zindex) {
   currentParkingPath = new google.maps.Polyline({
     path: pathArr,
     geodesic: true,
     strokeColor: color,
     strokeWeight: 2,
-    strokeOpacity: 1
+    strokeOpacity: 1,
+    zIndex: zindex
   });
   // add path to an array so it can be erased later
   pathsToErase.push(currentParkingPath);
@@ -57,8 +60,12 @@ function createPathObj(pointArr) {
 // - parses the lat lng data into google maps friendly format
 // - draws the polylines on the map & stores the data to erase the paths
 //
+// dataSet - obj with data from the API call
+// color - string
+// filterAttributes - obj with one or two items based on dataSet field aliases
+// zindex -
 //=======================================================================
-function drawParkingPath(dataSet, color, filterAttributes) {
+function drawParkingPath(dataSet, color, filterAttributes, zindex) {
   console.log(dataSet);
   //set variables with future types
 
@@ -77,7 +84,7 @@ function drawParkingPath(dataSet, color, filterAttributes) {
   let friendlyLatLngData = processLatLngData(filterLatLngPaths);
   // 3 draw polylines on google map
   friendlyLatLngData.forEach(latLngPath => {
-    addPolyline(latLngPath, color);
+    addPolyline(latLngPath, color, zindex);
   });
 }
 
@@ -225,6 +232,7 @@ function showFieldAliasOptions(dataSet, alias, comparedAlias) {
       daysAndTimes[attributes[alias]].push(attributes[comparedAlias]);
     }
   });
+  console.log(daysAndTimes);
 }
 
 //=======================================================================
@@ -240,5 +248,3 @@ function eraseParkingPath() {
     path.setMap(null);
   });
 }
-
-

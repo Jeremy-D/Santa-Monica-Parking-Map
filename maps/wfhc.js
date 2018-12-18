@@ -3,9 +3,15 @@
 let map;
 
 //fetch data from a url
-let url =
+const url =
   'http://csmgisweb.smgov.net/public/rest/services/planning_update/MapServer/3/query?where=1%3D1&outFields=*&geometry=-118.477%2C34.01%2C-118.455%2C34.017&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outSR=4326&f=json';
 //alt url in similar area 'http://csmgisweb.smgov.net/public/rest/services/planning_update/MapServer/3/query?where=1%3D1&outFields=*&outSR=4326&f=json'
+//url2 is preferential parking with spatial envelope filter
+const url2 =
+  'http://csmgisweb.smgov.net/public/rest/services/planning_update/MapServer/1/query?where=1%3D1&outFields=*&geometry=-118.477%2C34.011%2C-118.454%2C34.017&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outSR=4326&f=json';
+//url3 is the full preferential parking dataset
+const url3 =
+  'http://csmgisweb.smgov.net/public/rest/services/planning_update/MapServer/1/query?where=1%3D1&outFields=*&outSR=4326&f=json';
 
 function initMap() {
   //business location
@@ -30,7 +36,18 @@ function initMap() {
       return response.json();
     })
     .then(function(myJson) {
-      drawParkingPath(myJson, 'lime');
+      //drawParkingPath(myJson, 'lime');
+    });
+
+  const filterPermits = setFilterAttributes(['IMPLEMENTD']);
+  filterPermits.IMPLEMENTD = 'yes';
+  console.log(filterPermits);
+  fetch(url3)
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(myJson) {
+      drawParkingPath(myJson, 'orange', filterPermits, 2);
     });
 }
 
@@ -47,7 +64,7 @@ function testAPIsFunc() {
     'https://csmgisweb.smgov.net/csmgis01/rest/services/environment/watersheds/MapServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json';
   APIurl =
     'http://csmgisweb.smgov.net/public/rest/services/bike_network/MapServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json';
-  fetch(APIurl)
+  fetch(url3)
     .then(function(response) {
       return response.json();
     })
@@ -63,6 +80,8 @@ function testAPIsFunc() {
       // })
     });
 }
+
+testAPIsFunc();
 ////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////
@@ -72,5 +91,18 @@ setTimeout(function() {
   showFieldAliasOptions(smArcGisData, 'TIME');
 }, 3000);
 
+/////////////////
+//just testing out some attribute data
+/////////////////
+let permitParkingData;
+fetch(url3)
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(data) {
+    permitParking = data;
+  });
 
-
+setTimeout(function() {
+  showFieldAliasOptions(permitParking, 'IMPLEMENTD');
+}, 3000);

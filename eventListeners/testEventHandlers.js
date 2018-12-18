@@ -22,5 +22,5 @@ let setupFilterAttributes = setFilterAttributes(['DAY', 'TIME']);
 
 const drawPathDopeFunc = document.getElementById('draw-path-dope-func');
 drawPathDopeFunc.addEventListener('click', function() {
-	drawParkingPath(smArcGisData, 'red', setupFilterAttributes);
+	drawParkingPath(smArcGisData, 'red', setupFilterAttributes, 2);
 });
